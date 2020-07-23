@@ -1,10 +1,11 @@
-from __future__ import print_function
 from __future__ import division
+from __future__ import print_function
+
 import time
+
 import numpy as np
-from pyqtgraph.Qt import QtGui
 import pyqtgraph as pg
-from pyqtgraph.dockarea import *
+from pyqtgraph.Qt import QtGui
 
 
 class GUI:

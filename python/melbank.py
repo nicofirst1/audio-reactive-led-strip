@@ -30,7 +30,7 @@ Functions
 ---------
 """
 
-from numpy import abs, append, arange, insert, linspace, log10, round, zeros
+from numpy import abs, arange, linspace, log10, zeros
 
 
 def hertz_to_mel(freq):
@@ -58,7 +58,7 @@ def mel_to_hertz(mel):
     freq : scalar or ndarray
         Frequency value or array in Hz.
     """
-    return 700.0 * (10**(mel / 2595.0)) - 700.0
+    return 700.0 * (10 ** (mel / 2595.0)) - 700.0
 
 
 def melfrequencies_mel_filterbank(num_bands, freq_min, freq_max, num_fft_bands):
@@ -122,7 +122,7 @@ def compute_melmat(num_mel_bands=12, freq_min=64, freq_max=8000,
     frequencies : tuple (ndarray <num_mel_bands>, ndarray <num_fft_bands>)
         Center frequencies of the mel bands, center frequencies of fft spectrum.
     """
-    center_frequencies_mel, lower_edges_mel, upper_edges_mel =  \
+    center_frequencies_mel, lower_edges_mel, upper_edges_mel = \
         melfrequencies_mel_filterbank(
             num_mel_bands,
             freq_min,
@@ -138,15 +138,14 @@ def compute_melmat(num_mel_bands=12, freq_min=64, freq_max=8000,
 
     for imelband, (center, lower, upper) in enumerate(zip(
             center_frequencies_hz, lower_edges_hz, upper_edges_hz)):
-
         left_slope = (freqs >= lower) == (freqs <= center)
         melmat[imelband, left_slope] = (
-            (freqs[left_slope] - lower) / (center - lower)
+                (freqs[left_slope] - lower) / (center - lower)
         )
 
         right_slope = (freqs >= center) == (freqs <= upper)
         melmat[imelband, right_slope] = (
-            (upper - freqs[right_slope]) / (upper - center)
+                (upper - freqs[right_slope]) / (upper - center)
         )
 
     return melmat, (center_frequencies_mel, freqs)

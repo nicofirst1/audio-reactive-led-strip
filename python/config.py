@@ -1,10 +1,11 @@
 """Settings for audio reactive LED strip"""
-from __future__ import print_function
 from __future__ import division
+from __future__ import print_function
+
 import os
 
 DEVICE = 'esp8266'
-#DEVICE = 'pi'
+# DEVICE = 'pi'
 """Device used to control LED strip. Must be 'pi',  'esp8266' or 'blinkstick'
 
 'esp8266' means that you are using an ESP8266 module to control the LED strip
@@ -49,7 +50,7 @@ USE_GUI = True
 DISPLAY_FPS = True
 """Whether to display the FPS when running (can reduce performance)"""
 
-N_PIXELS = 600
+N_PIXELS = 64
 """Number of pixels in the LED strip (must match ESP8266 firmware)"""
 
 GAMMA_TABLE_PATH = os.path.join(os.path.dirname(__file__), 'gamma_table.npy')
@@ -74,13 +75,13 @@ appear "sluggish" or out of sync with the audio being played if it is too low.
 The FPS should not exceed the maximum refresh rate of the LED strip, which
 depends on how long the LED strip is.
 """
-_max_led_FPS = int(((N_PIXELS * 30e-6) + 50e-6)**-1.0)
+_max_led_FPS = int(((N_PIXELS * 30e-6) + 50e-6) ** -1.0)
 assert FPS <= _max_led_FPS, 'FPS must be <= {}'.format(_max_led_FPS)
 
 MIN_FREQUENCY = 200
 """Frequencies below this value will be removed during audio processing"""
 
-MAX_FREQUENCY = 6000
+MAX_FREQUENCY = 12000
 """Frequencies above this value will be removed during audio processing"""
 
 N_FFT_BINS = 24
@@ -103,3 +104,21 @@ N_ROLLING_HISTORY = 3
 
 MIN_VOLUME_THRESHOLD = 1e-7
 """No music visualization displayed if recorded audio volume below threshold"""
+
+CONFIGS = dict(
+    min_volume_threshold=MIN_VOLUME_THRESHOLD,
+    mic_rate=MIC_RATE,
+    fps=FPS,
+    n_rolling_history=N_ROLLING_HISTORY,
+    n_pixels=N_PIXELS,
+    n_fft_bins=N_FFT_BINS,
+    use_gui=USE_GUI,
+    min_frequency=MIN_FREQUENCY,
+    max_frequency=MAX_FREQUENCY,
+    display_fps=DISPLAY_FPS,
+    device=DEVICE,
+    gamma_table_path=GAMMA_TABLE_PATH,
+    software_gamma_correction=SOFTWARE_GAMMA_CORRECTION,
+    udp_ip=UDP_IP,
+    udp_port=UDP_PORT,
+)

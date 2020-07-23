@@ -1,18 +1,26 @@
 from __future__ import print_function
+
 import numpy as np
-import config
+
 import melbank
 
 
 class ExpFilter:
     """Simple exponential smoothing filter"""
-    def __init__(self, val=0.0, alpha_decay=0.5, alpha_rise=0.5):
+
+    def __init__(self, configs, val=0.0, alpha_decay=0.5, alpha_rise=0.5):
         """Small rise / decay factors = more smoothing"""
         assert 0.0 < alpha_decay < 1.0, 'Invalid decay smoothing factor'
         assert 0.0 < alpha_rise < 1.0, 'Invalid rise smoothing factor'
         self.alpha_decay = alpha_decay
         self.alpha_rise = alpha_rise
         self.value = val
+        self.configs = configs
+        self.mel_y = None
+        self.mel_x = None
+        self.configs = configs
+
+        self.create_mel_bank()
 
     def update(self, value):
         if isinstance(self.value, (list, np.ndarray, tuple)):
@@ -24,30 +32,16 @@ class ExpFilter:
         self.value = alpha * value + (1.0 - alpha) * self.value
         return self.value
 
+    def create_mel_bank(self):
 
-def rfft(data, window=None):
-    window = 1.0 if window is None else window(len(data))
-    ys = np.abs(np.fft.rfft(data * window))
-    xs = np.fft.rfftfreq(len(data), 1.0 / config.MIC_RATE)
-    return xs, ys
+        mic_rate = self.configs['mic_rate']
+        n_fft_bins = self.configs['n_fft_bins']
+        min_frequency = self.configs['min_frequency']
+        max_frequency = self.configs['max_frequency']
+        samples = int(self.configs['mic_rate'] * self.configs['n_rolling_history'] / (2.0 * self.configs['fps']))
 
-
-def fft(data, window=None):
-    window = 1.0 if window is None else window(len(data))
-    ys = np.fft.fft(data * window)
-    xs = np.fft.fftfreq(len(data), 1.0 / config.MIC_RATE)
-    return xs, ys
-
-
-def create_mel_bank():
-    global samples, mel_y, mel_x
-    samples = int(config.MIC_RATE * config.N_ROLLING_HISTORY / (2.0 * config.FPS))
-    mel_y, (_, mel_x) = melbank.compute_melmat(num_mel_bands=config.N_FFT_BINS,
-                                               freq_min=config.MIN_FREQUENCY,
-                                               freq_max=config.MAX_FREQUENCY,
-                                               num_fft_bands=samples,
-                                               sample_rate=config.MIC_RATE)
-samples = None
-mel_y = None
-mel_x = None
-create_mel_bank()
+        self.mel_y, (_, self.mel_x) = melbank.compute_melmat(num_mel_bands=n_fft_bins,
+                                                             freq_min=min_frequency,
+                                                             freq_max=max_frequency,
+                                                             num_fft_bands=samples,
+                                                             sample_rate=mic_rate)
