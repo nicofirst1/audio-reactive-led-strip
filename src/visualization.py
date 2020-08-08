@@ -141,6 +141,8 @@ class Visualizer:
         # Array containing the rolling audio sample window
         self.y_roll = np.random.rand(n_rolling_history, samples_per_frame) / 1e16
 
+        self.default_dsp= dsp.ExpFilter(CONFIGS)
+
     def visualize_scroll(self, y):
         """Effect that originates in the center and scrolls outwards"""
         y = y ** 2.0
@@ -230,8 +232,7 @@ class Visualizer:
             y_padded = np.pad(y_data, (0, N_zeros), mode='constant')
             YS = np.abs(np.fft.rfft(y_padded)[:N // 2])
             # Construct a Mel filterbank from the FFT data
-            tmp = dsp.ExpFilter(CONFIGS)
-            mel = np.atleast_2d(YS).T * tmp.mel_y.T
+            mel = np.atleast_2d(YS).T * self.default_dsp.mel_y.T
             # Scale data to values more suitable for visualization
             # mel = np.sum(mel, axis=0)
             mel = np.sum(mel, axis=0)
